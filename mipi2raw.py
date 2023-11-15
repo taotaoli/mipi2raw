@@ -37,7 +37,7 @@ def unpack_mipi_raw10(byte_buf):
 
 def unpack_mipi_raw12(byte_buf):
     data = np.frombuffer(byte_buf, dtype=np.uint8)
-    # 5 bytes contain 4 10-bit pixels (5x8 == 4x10)
+    # 3 bytes contain 2 12-bit pixels (3x8 == 2x12)
     b1, b2, b3 = np.reshape(
         data, (data.shape[0]//3, 3)).astype(np.uint16).T
     p1 = (b1 << 4) + ((b3) & 0xf)
@@ -49,7 +49,7 @@ def unpack_mipi_raw12(byte_buf):
 
 def unpack_mipi_raw14(byte_buf):
     data = np.frombuffer(byte_buf, dtype=np.uint8)
-    # 5 bytes contain 4 10-bit pixels (5x8 == 4x10)
+    # 7 bytes contain 4 14-bit pixels (7x8 == 4x14)
     b1, b2, b3, b4, b5, b6, b7 = np.reshape(
         data, (data.shape[0]//7, 7)).astype(np.uint16).T
     p1 = (b1 << 6) + (b5 & 0x3f)
