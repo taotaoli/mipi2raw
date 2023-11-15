@@ -4,19 +4,13 @@ import argparse
 import time
 import cv2
 
-global COLOR_BayerGB2BGR, COLOR_BayerRG2BGR, COLOR_BayerGR2BGR, COLOR_BayerBG2BGR
 global bayer_order_maps
 
-COLOR_BayerBG2BGR = 46
-COLOR_BayerGB2BGR = 47
-COLOR_BayerRG2BGR = 48
-COLOR_BayerGR2BGR = 49
-
 bayer_order_maps = {
-    "bayer_bg": COLOR_BayerBG2BGR,
-    "bayer_gb": COLOR_BayerGB2BGR,
-    "bayer_rg": COLOR_BayerRG2BGR,
-    "bayer_gr": COLOR_BayerGR2BGR,
+    "bayer_bg": cv2.COLOR_BayerBG2BGR,
+    "bayer_gb": cv2.COLOR_BayerGB2BGR,
+    "bayer_rg": cv2.COLOR_BayerRG2BGR,
+    "bayer_gr": cv2.COLOR_BayerGR2BGR,
     "gray": 0,
 }
 
@@ -86,7 +80,7 @@ def convertMipi2Raw(mipiFile, imgWidth, imgHeight, bitDeepth, bayer_order):
     bayerData.tofile(mipiFile[:-4]+'_unpack.raw')
 
     img = img.astype(np.uint8).reshape(imgHeight, imgWidth, 1)
-    rgbimg = cv2.cvtColor(img, cv2.COLOR_BayerBG2RGB)
+    rgbimg = cv2.cvtColor(img, bayer_order)
     cv2.imwrite(mipiFile[:-4]+'_unpack.jpg', rgbimg)
 
 
@@ -101,10 +95,11 @@ def ProcSingleFile(rawFile, img_width, img_height, rawDepth, bayer_order):
 
 
 def ProcPath(path, img_width, img_height, rawDepth, bayer_order):
+    print('procesing ', path)
     file_list = os.listdir(path)
     for f in file_list:
         f_lower = f.lower()
-        if f_lower.endswith('.raw'):
+        if f_lower.endswith('.rawmipi'):
             raw_name = '%s\%s' % (path, f)
             ProcSingleFile(raw_name, img_width, img_height,
                            rawDepth, bayer_order)
