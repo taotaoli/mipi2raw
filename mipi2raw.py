@@ -55,7 +55,7 @@ def unpack_mipi_raw14(byte_buf):
     return unpacked
 
 
-def convertMipi2Raw(mipiFile, imgWidth, imgHeight, bitDeepth, bayer_order):
+def convertMipi2Raw(mipiFile, imgWidth, imgHeight, bitDeepth, bayer_order=cv2.COLOR_BayerBG2BGR):
     mipiData = np.fromfile(mipiFile, dtype='uint8')
     print("mipiraw file size:", mipiData.size)
 
@@ -80,6 +80,7 @@ def convertMipi2Raw(mipiFile, imgWidth, imgHeight, bitDeepth, bayer_order):
     bayerData.tofile(mipiFile[:-4]+'_unpack.raw')
 
     img = img.astype(np.uint8).reshape(imgHeight, imgWidth, 1)
+    print(bayer_order)
     rgbimg = cv2.cvtColor(img, bayer_order)
     cv2.imwrite(mipiFile[:-4]+'_unpack.jpg', rgbimg)
 
@@ -119,7 +120,7 @@ if "__main__" == __name__:
     parser.add_argument(
         "--depth", help="raw image depth [8, 10, 12, 14, 16]", required=True, type=int)
     parser.add_argument(
-        "--bayer", help="bayer format [bayer_bg, bayer_rg, bayer_gb, bayer_gr]", required=True, type=str)
+        "--bayer", help="bayer format [bayer_bg, bayer_rg, bayer_gb, bayer_gr]", required=False, type=str)
 
     args = parser.parse_args()
 
@@ -128,7 +129,7 @@ if "__main__" == __name__:
     img_width = args.width
     img_height = args.height
     rawDepth = args.depth
-    bayer = args.bayer
+    bayer = args.bayer if args.bayer != None else 'bayer_bg'
     bayer_order = bayer_order_maps[bayer.lower()]
 
     if rawPath is not None:
